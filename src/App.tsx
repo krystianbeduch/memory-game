@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
-// import './style.css';
-import generateBoard from './utils/generateBoard.tsx';
-import Board from "./components/Board.tsx";
+import generateBoard from './utils/generateBoard';
+import Board from "./components/Board";
+import Header from "./components/Header";
+// @ts-ignore
+import { Button, ButtonGroup } from 'react-bootstrap';
 
-function App() {
+
+interface Card {
+    id: number;
+    image: string;
+    isFlipped: boolean;
+    isMatched: boolean;
+}
+
+const App: React.FC = () => {
     /*
     board - aktualny uklad planszy
     setBoard - uzywamy do zmiany planszy
@@ -15,29 +25,38 @@ function App() {
     moves - licznik ruchow gracza
     setMoves - zwiekszamy licznik ruchow przy kazdym ruchu
 
+    points - licznik punktow
+
     numRows, numCols - liczba wierszy i kolumn
     setNumRows, setNumCols - ustawienie nowej liczby wierszy i kolumn
     */
 
-    const [numRows, setNumRows] = useState(4);
-    const [numCols, setNumCols] = useState(4);
+    const [numRows, setNumRows] = useState<number>(4);
+    const [numCols, setNumCols] = useState<number>(4);
 
-    const [board, setBoard] = useState(generateBoard(numRows, numCols));
-    const [selectedCards, setSelectedCards] = useState([]);
-    const [moves, setMoves] = useState(0);
+    const [board, setBoard] = useState<Card[]>(generateBoard(numRows, numCols));
+    const [selectedCards, setSelectedCards] = useState<Card[]>([]);
+    const [moves, setMoves] = useState<number>(0);
+
+    const [points, setPoints] = useState<number>(0);
+    const [maxPoints, setMaxPoints] = useState<number>(8);
 
     // Hook do ponownego generowania planszy po zmianie liczby wierszy/kolumn
     useEffect(() => {
         setBoard(generateBoard(numRows, numCols));
+        const numPairs: number = (numRows * numCols) / 2;
+        setMaxPoints(numPairs);
     }, [numRows, numCols]); // Tylko gdy numRows lub numCols się zmienia
 
 
-    const handleSizeChange = (rows, cols) => {
+    const handleSizeChange = (rows: number, cols: number) => {
         setNumRows(rows);
         setNumCols(cols);
+        setMoves(0);
+        setPoints(0);
     };
 
-    const handleCardClick = (card) => {
+    const handleCardClick = (card: Card) => {
         // Ignorujemy klikniecie, jesli karta juz jest sparowana
         if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2) {
             return;
@@ -54,7 +73,7 @@ function App() {
             const [firstCard] = selectedCards;
 
             // Zwiekszamy licznik ruchw
-            setMoves((prev) => prev + 1);
+            setMoves(prev => prev + 1);
 
             // Sprawdzamy, czy karty pasuja do siebie
             if (firstCard.image === card.image) {
@@ -68,6 +87,8 @@ function App() {
                         c.image === card.image ? { ...c, isMatched: true } : c
                     )
                 );
+
+                setPoints(prev => prev + 1);
             }
 
             // Resetujemy wybrane karty po krotkim czasie
@@ -77,12 +98,40 @@ function App() {
 
     return (
         <div className="container text-center App">
-            <h1 className="my-4 text-light">Memory Game</h1>
+            <Header/>
             <p className="lead">Match all the pairs!</p>
-            <p>Moves: {moves}</p>
 
-            <button onClick={() => handleSizeChange(4, 4)}>4x4</button>
-            <button onClick={() => handleSizeChange(6, 6)}>6x6</button>
+            <p className="text-info mb-3">
+                You can change the game board size by selecting one of the options below:
+            </p>
+
+            <ButtonGroup className="mb-3">
+                <Button
+                    variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}
+                    size="lg"
+                    onClick={() => handleSizeChange(2, 2)}
+                >
+                    2x2
+                </Button>
+                <Button
+                    variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}
+                    size="lg"
+                    onClick={() => handleSizeChange(4, 4)}
+                >
+                    4x4
+                </Button>
+                <Button
+                    variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}
+                    size="lg"
+                    onClick={() => handleSizeChange(6, 6)}
+                >
+                    6x6
+                </Button>
+            </ButtonGroup>
+
+            <p>Moves: {moves}</p>
+            <p>Points: {points}/{maxPoints}</p>
+
             <Board
                 board={board}
                 selectedCards={selectedCards}

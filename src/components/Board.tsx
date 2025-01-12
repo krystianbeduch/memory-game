@@ -25,12 +25,13 @@ const Board: React.FC<BoardProps> = ({ board, selectedCards, handleCardClick, nu
     */
     return (
         <div className="board" style={gridStyle}>
-            {board.map((card) => (
+            {board.map((card, index) => (
                 <Card
                     key={card.id}
                     card={card}
                     isFlipped={selectedCards.includes(card) || card.isMatched}
                     onClick={() => handleCardClick(card)}
+                    index={index}
                 />
             ))}
         </div>

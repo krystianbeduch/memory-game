@@ -1,4 +1,11 @@
 /* Style globalne dla aplikacji */
+header {
+    text-align: center;
+}
+.logo {
+    height: 60px;
+    margin-bottom: 10px;
+}
 .App {
   /*text-align: center;*/
   /*background-color: #2e2e2e; !* Ciemniejsze tło aplikacji *!*/

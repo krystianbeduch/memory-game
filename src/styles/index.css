@@ -8,7 +8,7 @@
 
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: var(--primary-background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,12 +23,8 @@
   --card-back-background: #555; /* Kolor tła dla odwrotnej strony karty */
   --card-text-color: #fff; /* Kolor tekstu na odwrotnej stronie */
   --card-hover: #333; /* Kolor tła przy najechaniu na kartę */
-  --board-background: #f0f8ff; /* Kolor tła planszy */
-
+  --board-background: #333; /* Kolor tła planszy */
   --secondary-text-color: #555; /* Tekst w kolorze średnim */
-
-  --cols: 4;
-  --rows: 4;
 }
 
 *, *:before, *:after {
