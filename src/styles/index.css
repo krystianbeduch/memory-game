@@ -1,0 +1,58 @@
+/* Style bazowe */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --text-color-light: rgba(255, 255, 255, 0.87); /* Jasny tekst */
+  --text-color-dark: #333; /* Ciemny tekst */
+  --primary-background: #242424;
+  --card-background: #444;
+  --card-front-background: #f0f8ff; /* Jasny kolor dla przedniej strony karty */
+  --card-back-background: #555; /* Kolor tła dla odwrotnej strony karty */
+  --card-text-color: #fff; /* Kolor tekstu na odwrotnej stronie */
+  --card-hover: #333; /* Kolor tła przy najechaniu na kartę */
+  --board-background: #f0f8ff; /* Kolor tła planszy */
+
+  --secondary-text-color: #555; /* Tekst w kolorze średnim */
+
+  --cols: 4;
+  --rows: 4;
+}
+
+*, *:before, *:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--primary-background);
+  color: var(--text-color-light);
+}
+
+/*@media (prefers-color-scheme: light) {*/
+/*  :root {*/
+/*    color: #213547;*/
+/*    background-color: #ffffff;*/
+/*  }*/
+/*  a:hover {*/
+/*    color: #747bff;*/
+/*  }*/
+/*  button {*/
+/*    background-color: #f9f9f9;*/
+/*  }*/
+/*}*/

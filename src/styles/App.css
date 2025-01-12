@@ -1,0 +1,19 @@
+/* Style globalne dla aplikacji */
+.App {
+  /*text-align: center;*/
+  /*background-color: #2e2e2e; !* Ciemniejsze tło aplikacji *!*/
+  /*background-color: var(--board-background);*/
+  /*color: white;*/
+  /*min-height: 100vh;*/
+  /*padding: 20px;*/
+}
+
+h1 {
+  /*color: #fff; !* Biały kolor nagłówka *!*/
+  /*margin-bottom: 20px;*/
+}
+
+p {
+  /*font-size: 1.2rem;*/
+  /*color: #ccc; !* Jaśniejszy kolor dla tekstu *!*/
+}

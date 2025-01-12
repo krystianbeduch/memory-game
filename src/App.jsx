@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import './style.css';
-import generateBoard from './generateBoard';
+import React, { useState, useEffect } from 'react';
+// import './style.css';
+import generateBoard from './utils/generateBoard.tsx';
+import Board from "./components/Board.tsx";
 
 function App() {
     /*
@@ -13,14 +14,32 @@ function App() {
 
     moves - licznik ruchow gracza
     setMoves - zwiekszamy licznik ruchow przy kazdym ruchu
+
+    numRows, numCols - liczba wierszy i kolumn
+    setNumRows, setNumCols - ustawienie nowej liczby wierszy i kolumn
     */
-    const [board, setBoard] = useState(generateBoard());
+
+    const [numRows, setNumRows] = useState(4);
+    const [numCols, setNumCols] = useState(4);
+
+    const [board, setBoard] = useState(generateBoard(numRows, numCols));
     const [selectedCards, setSelectedCards] = useState([]);
     const [moves, setMoves] = useState(0);
 
+    // Hook do ponownego generowania planszy po zmianie liczby wierszy/kolumn
+    useEffect(() => {
+        setBoard(generateBoard(numRows, numCols));
+    }, [numRows, numCols]); // Tylko gdy numRows lub numCols się zmienia
+
+
+    const handleSizeChange = (rows, cols) => {
+        setNumRows(rows);
+        setNumCols(cols);
+    };
+
     const handleCardClick = (card) => {
         // Ignorujemy klikniecie, jesli karta juz jest sparowana
-        if (card.isMatched || selectedCards.length === 2) {
+        if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2) {
             return;
         }
 
@@ -56,35 +75,21 @@ function App() {
         }
     };
 
-    /*
-    div className="App" to glowna obudowa aplikacji z klasa CSS App, ktora pozowala na stylizacje
-    div className="board" to kontener dla planszy gry, ktora jest zbudowana z dynamicznie renderowanych kart
-
-    board.map() iteruje przez tablice board gdzie karta karta jest reprezentowana przez obiekt o polach {id, image, isMatched}
-    dla kazdej karty tworzony jest dynamiczny element div reprezentujacy pojedynczy kafalek na planszy
-    key - unikalny klucz dla kazdej karty wymagany przez React aby poprwanie zarzadzac lista elementow w DOM
-    className - zawsze przypisywana jest klasa card; dodatkowo jest karta znajduje sie w selectedCard (jest odkryta)
-    lub ma isMatched: true (jest dopasowana) to karta otrzymuje klase flipped, ktora pokazuje wizualnie ze jest odwrocona
-    */
-
     return (
-        <div className="App">
-            <h1>Memory Game</h1>
+        <div className="container text-center App">
+            <h1 className="my-4 text-light">Memory Game</h1>
+            <p className="lead">Match all the pairs!</p>
             <p>Moves: {moves}</p>
-            <div className="board">
-                {board.map((card) => (
-                    <div
-                        key={card.id}
-                        className={`card ${selectedCards.includes(card) || card.isMatched ? 'flipped' : ''}`}
-                        onClick={() => handleCardClick(card)}
-                    >
-                        <div className="card-front">
-                            <img src={card.image} alt="technology" />
-                        </div>
-                        <div className="card-back">?</div>
-                    </div>
-                ))}
-            </div>
+
+            <button onClick={() => handleSizeChange(4, 4)}>4x4</button>
+            <button onClick={() => handleSizeChange(6, 6)}>6x6</button>
+            <Board
+                board={board}
+                selectedCards={selectedCards}
+                handleCardClick={handleCardClick}
+                numRows={numRows}
+                numCols={numCols}
+            />
         </div>
     );
 }
