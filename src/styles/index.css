@@ -25,6 +25,8 @@
   --card-hover: #333; /* Kolor tła przy najechaniu na kartę */
   --board-background: #333; /* Kolor tła planszy */
   --secondary-text-color: #555; /* Tekst w kolorze średnim */
+
+  /*--i: 0;*/
 }
 
 *, *:before, *:after {

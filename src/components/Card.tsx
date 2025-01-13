@@ -17,11 +17,10 @@ const Card: React.FC<CardProps> = ({ card, isFlipped, onClick, index }) => {
         <div
             className={`card ${isFlipped ? 'flipped' : ''}`}
             onClick={onClick}
-            // style={{'--i': index} as React.CSSProperties} // Ustawienie opóźnienia animacji
-
+            style={{'--i': index} as React.CSSProperties} // Ustawienie opoznienia animacji
         >
             <div className="card-front">
-                <img src={card.image} alt="Memory card"/>
+                <img src={card.image} alt="Memory card" />
             </div>
             <div className="card-back">?</div>
         </div>
