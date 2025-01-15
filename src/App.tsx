@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+// @ts-ignore
+import axios, {AxiosError, AxiosResponse} from 'axios';
 import generateBoard from './utils/generateBoard';
 import Board from "./components/Board";
 import Header from "./components/Header";
 // @ts-ignore
 import { Button, ButtonGroup } from 'react-bootstrap';
-
 
 interface Card {
     id: number;
@@ -13,8 +14,26 @@ interface Card {
     isMatched: boolean;
 }
 
+interface Score {
+    id: string;
+    playerName: string;
+    moves: number;
+    board: string;
+    timeTaken: number;
+    createdAt: string;
+}
+
+const apiCall = () => {
+    axios.get("http://localhost:8080/api/scores").then((data: any) => {
+        console.log(data);
+    });
+};
+
 const App: React.FC = () => {
     /*
+    numRows, numCols - liczba wierszy i kolumn
+    setNumRows, setNumCols - ustawienie nowej liczby wierszy i kolumn
+
     board - aktualny uklad planszy
     setBoard - uzywamy do zmiany planszy
     Poczatkowa wartosc generowana za pomoca funkcji generateBoard
@@ -26,9 +45,10 @@ const App: React.FC = () => {
     setMoves - zwiekszamy licznik ruchow przy kazdym ruchu
 
     points - licznik punktow
+    maxPoints - maksymalna liczba punktow mozliwa do zdobycia na danej planszy
 
-    numRows, numCols - liczba wierszy i kolumn
-    setNumRows, setNumCols - ustawienie nowej liczby wierszy i kolumn
+    scores - wyniki graczy
+
     */
 
     const [numRows, setNumRows] = useState<number>(4);
@@ -41,12 +61,26 @@ const App: React.FC = () => {
     const [points, setPoints] = useState<number>(0);
     const [maxPoints, setMaxPoints] = useState<number>(8);
 
+    const [scores, setScores] = useState<Score[]>([]);
+    const [scoresByBoard, setScoresByBoard] = useState<string>(''); // '' - brak filtra
+
     // Hook do ponownego generowania planszy po zmianie liczby wierszy/kolumn
     useEffect(() => {
         setBoard(generateBoard(numRows, numCols));
         const numPairs: number = (numRows * numCols) / 2;
         setMaxPoints(numPairs);
     }, [numRows, numCols]); // Tylko gdy numRows lub numCols się zmienia
+
+    useEffect(() => {
+        axios
+            .get<Score[]>("http://localhost:8080/api/scores")
+            .then((response: AxiosResponse<Score[]>) => {
+                setScores(response.data);
+            })
+            .catch((error: AxiosError) => {
+                console.error("Error fetching scores: ", error.message);
+            })
+    }, []);
 
 
     const handleSizeChange = (rows: number, cols: number) => {
@@ -96,6 +130,14 @@ const App: React.FC = () => {
         }
     };
 
+    const handleBoardFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setScoresByBoard(event.target.value);
+    };
+
+    const filteredScores = scores.filter((score) =>
+        scoresByBoard === '' || score.board === scoresByBoard
+    );
+
     return (
         <div className="container text-center App">
             <Header/>
@@ -139,6 +181,81 @@ const App: React.FC = () => {
                 numRows={numRows}
                 numCols={numCols}
             />
+
+            <button onClick={apiCall}>Make API Call</button>
+
+            <h2 className="mt-5 best-scores-header" style={{ position: 'relative', textAlign: 'center' }}>
+                Best Scores
+                {/*<span className="text-center" style={{ flex: 1 }}>Best Scores</span>*/}
+            {/*</h2>*/}
+            {/*<div className="mb-3">*/}
+            {/*    <label htmlFor="boardFilter" className="form-label">Filter by boad size:</label>*/}
+                <select
+                    id="boardFilter"
+                    className="form-select bg-dark-subtle select-board-filter"
+                    value={scoresByBoard}
+                    onChange={handleBoardFilterChange}
+                    style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '200px',
+                        marginLeft: '15px'
+                    }}
+                >
+                    <option value="">All Board</option>
+                    <option value="2x2">2x2</option>
+                    <option value="4x4">4x4</option>
+                    <option value="6x6">6x6</option>
+                </select>
+            </h2>
+            {/*</div>*/}
+            <table className="table table-dark table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player Name</th>
+                    <th>Moves</th>
+                    <th>Board</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+                {/*<tbody>*/}
+                {/*    {scores.length > 0 ? (*/}
+                {/*        scores.map((score, index) => (*/}
+                {/*            <tr key={score.id}>*/}
+                {/*                <td>{index + 1}</td>*/}
+                {/*                <td>{score.playerName}</td>*/}
+                {/*                <td>{score.moves}</td>*/}
+                {/*                <td>{score.board}</td>*/}
+                {/*                <td>{score.timeTaken}</td>*/}
+                {/*            </tr>*/}
+                {/*        ))*/}
+                {/*    ) : (*/}
+                {/*        <tr>*/}
+                {/*            <td colSpan={5}>No scores available</td>*/}
+                {/*        </tr>*/}
+                {/*    )}*/}
+                {/*</tbody>*/}
+                <tbody>
+                {filteredScores.length > 0 ? (
+                    filteredScores.map((score, index) => (
+                        <tr key={score.id}>
+                            <td>{index + 1}</td>
+                            <td>{score.playerName}</td>
+                            <td>{score.moves}</td>
+                            <td>{score.board}</td>
+                            <td>{score.timeTaken}</td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan={5}>No scores available for the selected board</td>
+                    </tr>
+                )}
+                </tbody>
+            </table>
         </div>
     );
 }

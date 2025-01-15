@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://krystianbeduch:nqGeO807PWrOblFj@memory-game.dtuib.mongodb.net/?retryWrites=true&w=majority&appName=memory-game
+      database: memory-game
