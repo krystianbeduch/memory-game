@@ -6,9 +6,7 @@ import com.memoryBackend.memoryBackend.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,11 +22,16 @@ public class ScoreController {
 
     @GetMapping("/api/scores")
     public ResponseEntity<List<Score>> showScores() {
-        List<Score> scores = scoreService.getAllScores();
+        List<Score> scores = scoreService.getAllScoresOrderByBoardDescAndMovesAsc();
         if(scores == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(scores, HttpStatus.OK);
+    }
 
+    @PostMapping("/api/scores")
+    public ResponseEntity<Score> addScore(@RequestBody Score score) {
+        Score savedScore = scoreService.saveScore(score);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedScore);
     }
 }

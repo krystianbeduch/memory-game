@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Setter
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Document(collection = "scores")
 public class Score {
-
     @Id
     private String id;
     private String playerName;
@@ -22,54 +22,4 @@ public class Score {
     private String board; // Reprezentacja planszy np. 4x4
     private long timeTaken; // Czas ukonczenia w sekundach
     private LocalDateTime createdAt;
-
-
-//    public Score(String playerName, int score) {
-//        super();
-//        this.playerName = playerName;
-//        this.score = score;
-//        this.createdAt = LocalDateTime.now();
-//    }
-
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public void setId(String id) {
-//        this.id = id;
-//    }
-//
-//    public String getPlayerName() {
-//        return playerName;
-//    }
-//
-//    public void setPlayerName(String playerName) {
-//        this.playerName = playerName;
-//    }
-//
-//    public int getScore() {
-//        return score;
-//    }
-//
-//    public void setScore(int score) {
-//        this.score = score;
-//    }
-//
-//    public LocalDateTime getCreatedAt() {
-//        return createdAt;
-//    }
-//
-//    public void setCreatedAt(LocalDateTime createdAt) {
-//        this.createdAt = createdAt;
-//    }
-
-//    @Override
-//    public String toString() {
-//        return "Score{" +
-//                "id='" + id + '\'' +
-//                ", playerName='" + playerName + '\'' +
-//                ", score=" + score +
-//                ", createdAt=" + createdAt +
-//                '}';
-//    }
 }

@@ -9,7 +9,6 @@ const Header: React.FC = () => {
                 src={logo}
                 alt="Logo"
                 className="logo"
-                style={{ width: '50px', height: '50px' }}
             />
             <h1 className="ms-2 text-light">Memory Game</h1>
         </header>

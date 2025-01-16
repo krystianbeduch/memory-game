@@ -6,6 +6,7 @@ import Board from "./components/Board";
 import Header from "./components/Header";
 // @ts-ignore
 import { Button, ButtonGroup } from 'react-bootstrap';
+import './styles/App.css';
 
 interface Card {
     id: number;
@@ -47,8 +48,14 @@ const App: React.FC = () => {
     points - licznik punktow
     maxPoints - maksymalna liczba punktow mozliwa do zdobycia na danej planszy
 
-    scores - wyniki graczy
+    interval - interwal dla timera
+    timer - czas gry
+    isGameStarted - czy gra rozpoczeta
+    isGamePause - gra zatrzymana
+    isGmaeEnded - gra zakonczona
 
+    scores - wyniki graczy
+    playerName - nazwa gracza
     */
 
     const [numRows, setNumRows] = useState<number>(4);
@@ -61,6 +68,13 @@ const App: React.FC = () => {
     const [points, setPoints] = useState<number>(0);
     const [maxPoints, setMaxPoints] = useState<number>(8);
 
+    const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+    const [timer, setTimer] = useState<number>(0);
+    const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
+    const [isGamePaused, setIsGamePaused] = useState<boolean>(false);
+    const [isGameEnded, setIsGameEnded] = useState<boolean>(false);
+    const [playerName, setPlayerName] = useState<string>('');
+
     const [scores, setScores] = useState<Score[]>([]);
     const [scoresByBoard, setScoresByBoard] = useState<string>(''); // '' - brak filtra
 
@@ -71,6 +85,7 @@ const App: React.FC = () => {
         setMaxPoints(numPairs);
     }, [numRows, numCols]); // Tylko gdy numRows lub numCols się zmienia
 
+    // Pobierz dane z API
     useEffect(() => {
         axios
             .get<Score[]>("http://localhost:8080/api/scores")
@@ -82,6 +97,62 @@ const App: React.FC = () => {
             })
     }, []);
 
+    // Timer gry
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isGameStarted && !isGamePaused && !isGameEnded) {
+            interval = setInterval(() => {
+                setTimer(prevTime => prevTime + 1);
+            }, 1000);
+        }
+        else {
+            // @ts-ignore
+            clearInterval(interval);
+        }
+        return () => clearInterval(interval)
+    }, [isGameStarted, isGamePaused, isGameEnded]); // Tylko gdy zmieni sie stan gry
+
+    // Sprawdzenie czy koniec gry
+    useEffect(() => {
+        if (points === maxPoints) {
+            setIsGameEnded(true);
+            // clearInterval()
+        }
+    }, [points]);
+
+    const startGame = () => {
+        setIsGameStarted(true);
+        setIsGamePaused(false);
+        setTimer(0);
+    };
+
+    const pauseGame = () => {
+        setIsGamePaused(true);
+    };
+
+    const resumeGame = () => {
+        setIsGamePaused(false);
+    };
+
+    const endGame = () => {
+        setIsGameStarted(false);
+        setIsGamePaused(false);
+        setTimer(0);
+        setMoves(0);
+        setPoints(0);
+        setBoard(generateBoard(numRows, numCols));
+    };
+
+    // const gameOver = () => {
+    //     setIsGameEnded(true);
+    // };
+
+    const formatTime = (time: number)=> {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
 
     const handleSizeChange = (rows: number, cols: number) => {
         setNumRows(rows);
@@ -91,6 +162,11 @@ const App: React.FC = () => {
     };
 
     const handleCardClick = (card: Card) => {
+        // Ignorujemy jest gra nie jest rozpoczeta lub jest zapauzowana
+        if (!isGameStarted || isGamePaused) {
+            return;
+        }
+
         // Ignorujemy klikniecie, jesli karta juz jest sparowana
         if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2) {
             return;
@@ -138,41 +214,136 @@ const App: React.FC = () => {
         scoresByBoard === '' || score.board === scoresByBoard
     );
 
+    const saveScore = async () => {
+        if (playerName && points !== null && timer !== null) {
+            try {
+                const boardType = `${numCols}x${numRows}`;
+                const response = await axios.post('http://localhost:8080/api/scores', {
+                    playerName: playerName.trim(),
+                    moves: moves,
+                    board: boardType,
+                    timeTaken: timer,
+                });
+                console.log('Score saved:', response.data);
+                // window.reload();
+            }
+            catch (error) {
+                console.error('Error creating scores:', error);
+            }
+        }
+    };
+
+    const top10Scores = filteredScores.slice(0, 10);
+
     return (
         <div className="container text-center App">
             <Header/>
             <p className="lead">Match all the pairs!</p>
 
-            <p className="text-info mb-3">
-                You can change the game board size by selecting one of the options below:
-            </p>
+                {!isGameStarted && (
+                    <>
+                        <p className="text-info mb-3">
+                            You can change the game board size by selecting one of the options below:
+                        </p>
+                        <div className="button-group-wrapper">
+                            <ButtonGroup className="mb-3">
+                                <Button
+                                    variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}
+                                    size="lg"
+                                    onClick={() => handleSizeChange(2, 2)}
+                                >
+                                    2x2
+                                </Button>
+                                <Button
+                                    variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}
+                                    size="lg"
+                                    onClick={() => handleSizeChange(4, 4)}
+                                >
+                                    4x4
+                                </Button>
+                                <Button
+                                    variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}
+                                    size="lg"
+                                    onClick={() => handleSizeChange(6, 6)}
+                                >
+                                    6x6
+                                </Button>
+                            </ButtonGroup>
+                        </div>
+                    </>
+                )}
 
-            <ButtonGroup className="mb-3">
-                <Button
-                    variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}
-                    size="lg"
-                    onClick={() => handleSizeChange(2, 2)}
-                >
-                    2x2
-                </Button>
-                <Button
-                    variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}
-                    size="lg"
-                    onClick={() => handleSizeChange(4, 4)}
-                >
-                    4x4
-                </Button>
-                <Button
-                    variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}
-                    size="lg"
-                    onClick={() => handleSizeChange(6, 6)}
-                >
-                    6x6
-                </Button>
-            </ButtonGroup>
+                {!isGameStarted && (
+                    <Button
+                        className="start-button"
+                        onClick={startGame}
+                    >
+                        Start Game
+                    </Button>
+                )}
 
-            <p>Moves: {moves}</p>
-            <p>Points: {points}/{maxPoints}</p>
+                <ButtonGroup>
+                    {isGameStarted && !isGamePaused && (
+                        <Button
+                            className="pause-button"
+                            onClick={pauseGame}
+                        >
+                            Pause
+                        </Button>
+                    )}
+
+                    {isGameStarted && isGamePaused && (
+                        <Button
+                            className="resume-button"
+                            onClick={resumeGame}
+                        >
+                            Resume
+                        </Button>
+                    )}
+                    {isGameStarted && (
+                        <Button
+                            className="end-button"
+                            onClick={endGame}
+                        >
+                            End Game
+                        </Button>
+                    )}
+                </ButtonGroup>
+
+
+            {/*</div>*/}
+
+            {isGameStarted && !isGameEnded && (
+                <>
+                    <div className="time-elapsed mb-2 mt-1">
+                        {isGameStarted ? `Time: ${formatTime(timer)}` : ''}
+                    </div>
+                    <p className="mb-0">Moves: {moves}</p>
+                    <p>Points: {points}/{maxPoints}</p>
+                </>
+            )}
+
+            {isGameEnded && (
+                <div className="mt-2">
+                    <h2>Game Over</h2>
+                    <p>You finished the game on the {numRows}x{numCols} board in {formatTime(timer)} in {moves} moves</p>
+
+                    <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                    />
+
+                    <Button
+                        className="btn-success mt-3"
+                        onClick={saveScore}
+                    >
+                        Save Score
+                    </Button>
+
+                </div>
+            )}
 
             <Board
                 board={board}
@@ -182,27 +353,13 @@ const App: React.FC = () => {
                 numCols={numCols}
             />
 
-            <button onClick={apiCall}>Make API Call</button>
-
-            <h2 className="mt-5 best-scores-header" style={{ position: 'relative', textAlign: 'center' }}>
-                Best Scores
-                {/*<span className="text-center" style={{ flex: 1 }}>Best Scores</span>*/}
-            {/*</h2>*/}
-            {/*<div className="mb-3">*/}
-            {/*    <label htmlFor="boardFilter" className="form-label">Filter by boad size:</label>*/}
+            <h2 className="mt-5 best-scores-header" >
+                Top 10 Best Scores
                 <select
                     id="boardFilter"
                     className="form-select bg-dark-subtle select-board-filter"
                     value={scoresByBoard}
                     onChange={handleBoardFilterChange}
-                    style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: '200px',
-                        marginLeft: '15px'
-                    }}
                 >
                     <option value="">All Board</option>
                     <option value="2x2">2x2</option>
@@ -210,7 +367,7 @@ const App: React.FC = () => {
                     <option value="6x6">6x6</option>
                 </select>
             </h2>
-            {/*</div>*/}
+
             <table className="table table-dark table-bordered table-striped">
                 <thead>
                 <tr>
@@ -221,26 +378,9 @@ const App: React.FC = () => {
                     <th>Time</th>
                 </tr>
                 </thead>
-                {/*<tbody>*/}
-                {/*    {scores.length > 0 ? (*/}
-                {/*        scores.map((score, index) => (*/}
-                {/*            <tr key={score.id}>*/}
-                {/*                <td>{index + 1}</td>*/}
-                {/*                <td>{score.playerName}</td>*/}
-                {/*                <td>{score.moves}</td>*/}
-                {/*                <td>{score.board}</td>*/}
-                {/*                <td>{score.timeTaken}</td>*/}
-                {/*            </tr>*/}
-                {/*        ))*/}
-                {/*    ) : (*/}
-                {/*        <tr>*/}
-                {/*            <td colSpan={5}>No scores available</td>*/}
-                {/*        </tr>*/}
-                {/*    )}*/}
-                {/*</tbody>*/}
                 <tbody>
-                {filteredScores.length > 0 ? (
-                    filteredScores.map((score, index) => (
+                {top10Scores.length > 0 ? (
+                    top10Scores.map((score, index) => (
                         <tr key={score.id}>
                             <td>{index + 1}</td>
                             <td>{score.playerName}</td>

@@ -1,12 +1,15 @@
 /*.select-board-filter {*/
+/*    position: absolute;*/
+/*    right: 0;*/
+/*    top: 50%;*/
+/*    transform: translateY(-50%);*/
 /*    width: 200px;*/
 /*    margin-left: 15px;*/
-/*    !*display: inline-block;*!*/
 /*}*/
 
-.best-scores-header {
-    position: relative;
-}
+/*.best-scores-header {*/
+/*    position: relative;*/
+/*}*/
 
 .card {
     /*width: 90px;*/
