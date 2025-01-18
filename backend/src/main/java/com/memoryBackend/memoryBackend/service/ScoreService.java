@@ -3,7 +3,6 @@ package com.memoryBackend.memoryBackend.service;
 import com.memoryBackend.memoryBackend.model.Score;
 import com.memoryBackend.memoryBackend.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,6 @@
 package com.memoryBackend.memoryBackend.controller;
 
 import com.memoryBackend.memoryBackend.model.Score;
-import com.memoryBackend.memoryBackend.repository.ScoreRepository;
 import com.memoryBackend.memoryBackend.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
