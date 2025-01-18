@@ -15,18 +15,20 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --text-color-light: rgba(255, 255, 255, 0.87); /* Jasny tekst */
-  --text-color-dark: #333; /* Ciemny tekst */
+  --text-color-light: rgba(255, 255, 255, 0.87);
+  --text-color-dark: #333;
   --primary-background: #242424;
   --card-background: #444;
-  --card-front-background: #f0f8ff; /* Jasny kolor dla przedniej strony karty */
-  --card-back-background: #555; /* Kolor tła dla odwrotnej strony karty */
-  --card-text-color: #fff; /* Kolor tekstu na odwrotnej stronie */
-  --card-hover: #333; /* Kolor tła przy najechaniu na kartę */
-  --board-background: #333; /* Kolor tła planszy */
-  --secondary-text-color: #555; /* Tekst w kolorze średnim */
-
-  /*--i: 0;*/
+  --card-front-background: #f0f8ff;
+  --card-back-background: #555;
+  --card-text-color: #fff;
+  --card-hover: #333;
+  --board-background: #333;
+  --secondary-text-color: #555;
+  --progress-bar-bg: #e9ecef;
+  --progress-bar-success: #198754;
+  --progress-bar-danger: #dc3545;
+  --progress-bar-warning: #ffc107;
 }
 
 *, *:before, *:after {
@@ -41,16 +43,3 @@ body {
   background-color: var(--primary-background);
   color: var(--text-color-light);
 }
-
-/*@media (prefers-color-scheme: light) {*/
-/*  :root {*/
-/*    color: #213547;*/
-/*    background-color: #ffffff;*/
-/*  }*/
-/*  a:hover {*/
-/*    color: #747bff;*/
-/*  }*/
-/*  button {*/
-/*    background-color: #f9f9f9;*/
-/*  }*/
-/*}*/

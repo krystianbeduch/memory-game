@@ -26,7 +26,7 @@
     transform: translateY(-50px); /* Początkowa pozycja poza ekranem */
     opacity: 0;
     animation: dealCards 0.5s ease-out forwards;
-    animation-delay: calc(0.1s * var(--i)); /* Opóźnienie dla każdej karty */
+    animation-delay: calc(0.1s * var(--i)); /* Opoznienie dla kazdej karty */
 }
 
 .card.flipped .card-front {
@@ -78,4 +78,28 @@
 
 .card-front:hover {
     cursor: grab;
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 80px;
+        height: 80px;
+    }
+
+    .card-front img {
+        width: 65%;
+        height: 65%;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: 70px;
+        height: 70px;
+    }
+
+    .card-front img {
+        width: 55%;
+        height: 55%;
+    }
 }

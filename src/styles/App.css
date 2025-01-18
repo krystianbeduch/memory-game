@@ -1,39 +1,4 @@
 /* Style globalne dla aplikacji */
-header {
-    /*text-align: center;*/
-    /*width: 50px;*/
-    /*height: 50px;*/
-}
-.logo {
-    /*height: 60px;*/
-    /*margin-bottom: 10px;*/
-    width: 50px;
-    height: 50px;
-}
-
-.button-group-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.resume-button, .pause-button, .end-button {
-    min-width: 6vw;
-}
-
-.select-board-filter {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 200px;
-    margin-left: 15px;
-}
-
-.best-scores-header {
-    position: relative;
-}
-
 .App {
   /*text-align: center;*/
   /*background-color: #2e2e2e; !* Ciemniejsze tło aplikacji *!*/
@@ -43,12 +8,15 @@ header {
   /*padding: 20px;*/
 }
 
-h1 {
-  /*color: #fff; !* Biały kolor nagłówka *!*/
-  /*margin-bottom: 20px;*/
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.25em;
+    }
 }
 
-p {
-  /*font-size: 1.2rem;*/
-  /*color: #ccc; !* Jaśniejszy kolor dla tekstu *!*/
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1em;
+    }
 }

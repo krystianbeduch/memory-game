@@ -1,0 +1,12 @@
+.button-group-wrapper .btn {
+    font-size: 1.1em;
+    padding: 0.4em 1.1em;
+}
+
+/* Dostosowanie do mniejszych ekranów */
+@media (max-width: 768px) {
+    .button-group-wrapper .btn {
+        font-size: 1em;
+        padding: 0.5em 0.75em;
+    }
+}

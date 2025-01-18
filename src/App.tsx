@@ -4,9 +4,17 @@ import axios, {AxiosError, AxiosResponse} from 'axios';
 import generateBoard from './utils/generateBoard';
 import Board from "./components/Board";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
+import AlertWithTimer from "./components/AlertWithTimer";
+
 // @ts-ignore
-import { Button, ButtonGroup } from 'react-bootstrap';
+import {Button, ButtonGroup, Table} from 'react-bootstrap';
 import './styles/App.css';
+import BoardSizeSelector from "./components/BoardSizeSelector";
+import GameControls from "./components/GameControls";
+import GameInfo from "./components/GameInfo";
+import ScoreTable from "./components/ScoreTable";
+import GameEndScreen from "./components/GameEndScreen";
 
 interface Card {
     id: number;
@@ -23,12 +31,6 @@ interface Score {
     timeTaken: number;
     createdAt: string;
 }
-
-const apiCall = () => {
-    axios.get("http://localhost:8080/api/scores").then((data: any) => {
-        console.log(data);
-    });
-};
 
 const App: React.FC = () => {
     /*
@@ -48,14 +50,19 @@ const App: React.FC = () => {
     points - licznik punktow
     maxPoints - maksymalna liczba punktow mozliwa do zdobycia na danej planszy
 
-    interval - interwal dla timera
     timer - czas gry
     isGameStarted - czy gra rozpoczeta
     isGamePause - gra zatrzymana
-    isGmaeEnded - gra zakonczona
+    isGameEnded - gra zakonczona
 
     scores - wyniki graczy
+    scoresByBoard - filtr tabeli
     playerName - nazwa gracza
+    isScoresSaved - czy wynik zapisany
+
+    alertMessage - komunikaty
+    alertType - typ komunikatu
+    alertVisible - widocznosc alerta
     */
 
     const [numRows, setNumRows] = useState<number>(4);
@@ -68,15 +75,19 @@ const App: React.FC = () => {
     const [points, setPoints] = useState<number>(0);
     const [maxPoints, setMaxPoints] = useState<number>(8);
 
-    const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
     const [timer, setTimer] = useState<number>(0);
     const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
     const [isGamePaused, setIsGamePaused] = useState<boolean>(false);
     const [isGameEnded, setIsGameEnded] = useState<boolean>(false);
-    const [playerName, setPlayerName] = useState<string>('');
 
     const [scores, setScores] = useState<Score[]>([]);
     const [scoresByBoard, setScoresByBoard] = useState<string>(''); // '' - brak filtra
+    const [playerName, setPlayerName] = useState<string>('');
+    const [isScoresSaved, setIsScoresSaved] = useState<boolean>(false);
+
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertType, setAlertType] = useState<string | null>(null);
+    const [alertVisible, setAlertVisible] = useState<boolean>(false);
 
     // Hook do ponownego generowania planszy po zmianie liczby wierszy/kolumn
     useEffect(() => {
@@ -88,16 +99,57 @@ const App: React.FC = () => {
     // Pobierz dane z API
     useEffect(() => {
         axios
-            .get<Score[]>("http://localhost:8080/api/scores")
+            .get<Score[]>('http://localhost:8080/api/scores')
             .then((response: AxiosResponse<Score[]>) => {
                 setScores(response.data);
             })
             .catch((error: AxiosError) => {
-                console.error("Error fetching scores: ", error.message);
+                console.error('Error fetching scores: ', error.message);
             })
     }, []);
 
-    // Timer gry
+    // Zapisz wynik gry
+    const saveScore = async () => {
+        if (playerName.trim() && points !== null && timer !== null) {
+            try {
+                const boardType = `${numCols}x${numRows}`;
+                const response = await axios.post('http://localhost:8080/api/scores', {
+                    playerName: playerName.trim(),
+                    moves: moves,
+                    board: boardType,
+                    timeTaken: timer,
+                });
+                console.log('Score saved:', response.data);
+                setAlertMessage('Your score has been saved successfully!');
+                setAlertType('success');
+                setIsScoresSaved(true);
+            }
+            catch (error) {
+                console.error('Error creating scores:', error);
+                setAlertMessage('Failed to save your score. Please try again');
+                setAlertType('danger');
+            }
+        }
+        else {
+            setAlertMessage('Please ensure your name is entered!');
+            setAlertType('warning');
+        }
+    };
+
+    const closeAlert = () => {
+        setAlertMessage(null);
+        setAlertType(null);
+        setAlertVisible(false)
+    };
+
+    // // Wyswietlanie alertu
+    useEffect(() => {
+        if (alertMessage) {
+            setAlertVisible(true)
+        }
+    }, [alertMessage]);
+
+    // GameInfo gry
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
@@ -117,14 +169,17 @@ const App: React.FC = () => {
     useEffect(() => {
         if (points === maxPoints) {
             setIsGameEnded(true);
-            // clearInterval()
         }
     }, [points]);
 
-    const startGame = () => {
-        setIsGameStarted(true);
+    const startGame = (gameState: boolean = true) => {
+        setIsGameStarted(gameState);
         setIsGamePaused(false);
+        setIsGameEnded(false);
         setTimer(0);
+        setMoves(0);
+        setPoints(0);
+        setIsScoresSaved(false);
     };
 
     const pauseGame = () => {
@@ -136,17 +191,9 @@ const App: React.FC = () => {
     };
 
     const endGame = () => {
-        setIsGameStarted(false);
-        setIsGamePaused(false);
-        setTimer(0);
-        setMoves(0);
-        setPoints(0);
+        startGame(false);
         setBoard(generateBoard(numRows, numCols));
     };
-
-    // const gameOver = () => {
-    //     setIsGameEnded(true);
-    // };
 
     const formatTime = (time: number)=> {
         const minutes = Math.floor(time / 60);
@@ -162,13 +209,8 @@ const App: React.FC = () => {
     };
 
     const handleCardClick = (card: Card) => {
-        // Ignorujemy jest gra nie jest rozpoczeta lub jest zapauzowana
-        if (!isGameStarted || isGamePaused) {
-            return;
-        }
-
-        // Ignorujemy klikniecie, jesli karta juz jest sparowana
-        if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2) {
+        // Ignorujemy klikniecie, jesli karta juz jest sparowana a takze jest gra nie jest rozpoczeta lub zapauzowana
+        if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2 || !isGameStarted || isGamePaused) {
             return;
         }
 
@@ -214,136 +256,171 @@ const App: React.FC = () => {
         scoresByBoard === '' || score.board === scoresByBoard
     );
 
-    const saveScore = async () => {
-        if (playerName && points !== null && timer !== null) {
-            try {
-                const boardType = `${numCols}x${numRows}`;
-                const response = await axios.post('http://localhost:8080/api/scores', {
-                    playerName: playerName.trim(),
-                    moves: moves,
-                    board: boardType,
-                    timeTaken: timer,
-                });
-                console.log('Score saved:', response.data);
-                // window.reload();
-            }
-            catch (error) {
-                console.error('Error creating scores:', error);
-            }
-        }
-    };
-
     const top10Scores = filteredScores.slice(0, 10);
 
     return (
         <div className="container text-center App">
+            <AlertWithTimer
+                message={alertMessage}
+                type={alertType}
+                show={alertVisible}
+                onClose={closeAlert}
+            />
+
             <Header/>
-            <p className="lead">Match all the pairs!</p>
+            {/*<p className="lead">Match all the pairs!</p>*/}
 
-                {!isGameStarted && (
-                    <>
-                        <p className="text-info mb-3">
-                            You can change the game board size by selecting one of the options below:
-                        </p>
-                        <div className="button-group-wrapper">
-                            <ButtonGroup className="mb-3">
-                                <Button
-                                    variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}
-                                    size="lg"
-                                    onClick={() => handleSizeChange(2, 2)}
-                                >
-                                    2x2
-                                </Button>
-                                <Button
-                                    variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}
-                                    size="lg"
-                                    onClick={() => handleSizeChange(4, 4)}
-                                >
-                                    4x4
-                                </Button>
-                                <Button
-                                    variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}
-                                    size="lg"
-                                    onClick={() => handleSizeChange(6, 6)}
-                                >
-                                    6x6
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </>
-                )}
+            {/*<BoardSizeSelector*/}
+            {/*    numRows={numRows}*/}
+            {/*    numCols={numCols}*/}
+            {/*    onSizeChange={handleSizeChange}*/}
+            {/*/>*/}
 
-                {!isGameStarted && (
-                    <Button
-                        className="start-button"
-                        onClick={startGame}
-                    >
-                        Start Game
-                    </Button>
-                )}
-
-                <ButtonGroup>
-                    {isGameStarted && !isGamePaused && (
-                        <Button
-                            className="pause-button"
-                            onClick={pauseGame}
-                        >
-                            Pause
-                        </Button>
-                    )}
-
-                    {isGameStarted && isGamePaused && (
-                        <Button
-                            className="resume-button"
-                            onClick={resumeGame}
-                        >
-                            Resume
-                        </Button>
-                    )}
-                    {isGameStarted && (
-                        <Button
-                            className="end-button"
-                            onClick={endGame}
-                        >
-                            End Game
-                        </Button>
-                    )}
-                </ButtonGroup>
-
-
-            {/*</div>*/}
-
-            {isGameStarted && !isGameEnded && (
+            {!isGameStarted && (
                 <>
-                    <div className="time-elapsed mb-2 mt-1">
-                        {isGameStarted ? `Time: ${formatTime(timer)}` : ''}
-                    </div>
-                    <p className="mb-0">Moves: {moves}</p>
-                    <p>Points: {points}/{maxPoints}</p>
+                    {/*<p className="text-info mb-3">*/}
+                    {/*    You can change the game board size by selecting one of the options below:*/}
+                    {/*</p>*/}
+                    <BoardSizeSelector
+                        numRows={numRows}
+                        numCols={numCols}
+                        onSizeChange={handleSizeChange}
+                    />
+                    {/*<div className="button-group-wrapper">*/}
+                        {/*<ButtonGroup className="mb-3">*/}
+                        {/*    <Button*/}
+                        {/*        variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}*/}
+                        {/*        size="lg"*/}
+                        {/*        onClick={() => handleSizeChange(2, 2)}*/}
+                        {/*    >*/}
+                        {/*        2x2*/}
+                        {/*    </Button>*/}
+                        {/*    <Button*/}
+                        {/*        variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}*/}
+                        {/*        size="lg"*/}
+                        {/*        onClick={() => handleSizeChange(4, 4)}*/}
+                        {/*    >*/}
+                        {/*        4x4*/}
+                        {/*    </Button>*/}
+                        {/*    <Button*/}
+                        {/*        variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}*/}
+                        {/*        size="lg"*/}
+                        {/*        onClick={() => handleSizeChange(6, 6)}*/}
+                        {/*    >*/}
+                        {/*        6x6*/}
+                        {/*    </Button>*/}
+                        {/*</ButtonGroup>*/}
+                    {/*</div>*/}
                 </>
             )}
 
-            {isGameEnded && (
-                <div className="mt-2">
-                    <h2>Game Over</h2>
-                    <p>You finished the game on the {numRows}x{numCols} board in {formatTime(timer)} in {moves} moves</p>
+            <GameControls
+                isGameStarted={isGameStarted}
+                isGamePaused={isGamePaused}
+                isGameEnded={isGameEnded}
+                onStart={() => startGame()}
+                onPause={pauseGame}
+                onResume={resumeGame}
+                onEnd={endGame}
+            />
 
-                    <input
-                        type="text"
-                        placeholder="Enter your name"
-                        value={playerName}
-                        onChange={(e) => setPlayerName(e.target.value)}
-                    />
+            {/*{!isGameStarted && (*/}
+            {/*    <Button*/}
+            {/*        className="start-button"*/}
+            {/*        onClick={startGame}*/}
+            {/*    >*/}
+            {/*        Start Game*/}
+            {/*    </Button>*/}
+            {/*)}*/}
 
-                    <Button
-                        className="btn-success mt-3"
-                        onClick={saveScore}
-                    >
-                        Save Score
-                    </Button>
+            {/*<ButtonGroup>*/}
+            {/*    {isGameStarted && !isGamePaused && !isGameEnded && (*/}
+            {/*        <Button*/}
+            {/*            className="pause-button"*/}
+            {/*            onClick={pauseGame}*/}
+            {/*        >*/}
+            {/*            Pause*/}
+            {/*        </Button>*/}
+            {/*    )}*/}
 
-                </div>
-            )}
+            {/*    {isGameStarted && isGamePaused && (*/}
+            {/*        <Button*/}
+            {/*            className="resume-button"*/}
+            {/*            onClick={resumeGame}*/}
+            {/*        >*/}
+            {/*            Resume*/}
+            {/*        </Button>*/}
+            {/*    )}*/}
+            {/*    {isGameStarted && (*/}
+            {/*        <Button*/}
+            {/*            className="end-button"*/}
+            {/*            onClick={endGame}*/}
+            {/*        >*/}
+            {/*            End Game*/}
+            {/*        </Button>*/}
+            {/*    )}*/}
+            {/*</ButtonGroup>*/}
+
+            <GameInfo
+                time={timer}
+                isGameStarted={isGameStarted}
+                isGameEnded={isGameEnded}
+                moves={moves}
+                points={points}
+                maxPoints={maxPoints}
+            />
+
+            {/*{isGameStarted && !isGameEnded && (*/}
+            {/*    <>*/}
+            {/*        <div className="time-elapsed mb-2 mt-1">*/}
+            {/*            {isGameStarted ? `Time: ${formatTime(timer)}` : ''}*/}
+            {/*        </div>*/}
+            {/*        <p className="mb-0">Moves: {moves}</p>*/}
+            {/*        <p>Points: {points}/{maxPoints}</p>*/}
+            {/*    </>*/}
+            {/*)}*/}
+
+            <GameEndScreen
+                isGameEnded={isGameEnded}
+                numRows={numRows}
+                numCols={numCols}
+                timer={timer}
+                moves={moves}
+                isScoresSaved={isScoresSaved}
+                playerName={playerName}
+                setPlayerName={setPlayerName}
+                saveScore={saveScore}
+                formatTime={formatTime}
+            />
+
+            {/*{isGameEnded && (*/}
+            {/*    <div className="mt-2">*/}
+            {/*        <h2>Congratulations</h2>*/}
+            {/*        <p>*/}
+            {/*            You finished the game on the {numRows}x{numCols} board*/}
+            {/*            in {formatTime(timer)} in {moves} moves*/}
+            {/*        </p>*/}
+
+            {/*        {!isScoresSaved && (*/}
+            {/*            <>*/}
+            {/*                <input*/}
+            {/*                    type="text"*/}
+            {/*                    placeholder="Enter your name"*/}
+            {/*                    value={playerName}*/}
+            {/*                    onChange={(e) => setPlayerName(e.target.value)}*/}
+            {/*                    className="form-control w-25 mx-auto bg-secondary text-white"*/}
+            {/*                />*/}
+
+            {/*                <Button*/}
+            {/*                    className="d-block mx-auto mt-3 w-25"*/}
+            {/*                    onClick={saveScore}*/}
+            {/*                >*/}
+            {/*                    Save Score*/}
+            {/*                </Button>*/}
+            {/*            </>*/}
+            {/*        )}*/}
+            {/*    </div>*/}
+            {/*)}*/}
 
             <Board
                 board={board}
@@ -353,50 +430,59 @@ const App: React.FC = () => {
                 numCols={numCols}
             />
 
-            <h2 className="mt-5 best-scores-header" >
-                Top 10 Best Scores
-                <select
-                    id="boardFilter"
-                    className="form-select bg-dark-subtle select-board-filter"
-                    value={scoresByBoard}
-                    onChange={handleBoardFilterChange}
-                >
-                    <option value="">All Board</option>
-                    <option value="2x2">2x2</option>
-                    <option value="4x4">4x4</option>
-                    <option value="6x6">6x6</option>
-                </select>
-            </h2>
+            <ScoreTable
+                scores={top10Scores}
+                scoresByBoard={scoresByBoard}
+                onFilterChange={handleBoardFilterChange}
+            />
 
-            <table className="table table-dark table-bordered table-striped">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Player Name</th>
-                    <th>Moves</th>
-                    <th>Board</th>
-                    <th>Time</th>
-                </tr>
-                </thead>
-                <tbody>
-                {top10Scores.length > 0 ? (
-                    top10Scores.map((score, index) => (
-                        <tr key={score.id}>
-                            <td>{index + 1}</td>
-                            <td>{score.playerName}</td>
-                            <td>{score.moves}</td>
-                            <td>{score.board}</td>
-                            <td>{score.timeTaken}</td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan={5}>No scores available for the selected board</td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
+            {/*<h2 className="mt-5 best-scores-header">*/}
+            {/*    Top 10 Best Scores*/}
+            {/*    <select*/}
+            {/*        id="boardFilter"*/}
+            {/*        className="form-select bg-dark-subtle select-board-filter"*/}
+            {/*        value={scoresByBoard}*/}
+            {/*        onChange={handleBoardFilterChange}*/}
+            {/*    >*/}
+            {/*        <option value="">All Board</option>*/}
+            {/*        <option value="2x2">2x2</option>*/}
+            {/*        <option value="4x4">4x4</option>*/}
+            {/*        <option value="6x6">6x6</option>*/}
+            {/*    </select>*/}
+            {/*</h2>*/}
+
+            {/*<table className="table table-dark table-bordered table-striped">*/}
+            {/*    <thead>*/}
+            {/*    <tr>*/}
+            {/*        <th>#</th>*/}
+            {/*        <th>Player Name</th>*/}
+            {/*        <th>Moves</th>*/}
+            {/*        <th>Board</th>*/}
+            {/*        <th>Time</th>*/}
+            {/*    </tr>*/}
+            {/*    </thead>*/}
+            {/*    <tbody>*/}
+            {/*    {top10Scores.length > 0 ? (*/}
+            {/*        top10Scores.map((score, index) => (*/}
+            {/*            <tr key={score.id}>*/}
+            {/*                <td>{index + 1}</td>*/}
+            {/*                <td>{score.playerName}</td>*/}
+            {/*                <td>{score.moves}</td>*/}
+            {/*                <td>{score.board}</td>*/}
+            {/*                <td>{score.timeTaken}</td>*/}
+            {/*            </tr>*/}
+            {/*        ))*/}
+            {/*    ) : (*/}
+            {/*        <tr>*/}
+            {/*            <td colSpan={5}>No scores available for the selected board</td>*/}
+            {/*        </tr>*/}
+            {/*    )}*/}
+            {/*    </tbody>*/}
+            {/*</table>*/}
+
+            <Footer/>
+
+        </div> // App
     );
 }
 

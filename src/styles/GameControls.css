@@ -1,0 +1,17 @@
+.resume-button, .pause-button, .end-button {
+    min-width: 6.5vw;
+}
+
+@media (max-width: 768px) {
+    .resume-button, .pause-button, .end-button {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .resume-button, .pause-button, .end-button {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+}

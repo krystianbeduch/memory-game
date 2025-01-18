@@ -15,3 +15,17 @@
     max-width: 100%;
     min-width: 200px;
 }
+
+
+@media (max-width: 768px) {
+    .board {
+        padding: 10px;
+        gap: 8px; /* Mniejszy odstęp między elementami */
+    }
+}
+
+@media (max-width: 480px) {
+    .board {
+        gap: 5px;
+    }
+}

@@ -9,7 +9,7 @@ interface TimerProps {
     maxPoints: number;
 }
 
-const Timer: React.FC<TimerProps> = ({
+const GameInfo: React.FC<TimerProps> = ({
      time,
      isGameStarted,
      isGameEnded,
@@ -37,4 +37,4 @@ const Timer: React.FC<TimerProps> = ({
     )
 };
 
-export default Timer;
+export default GameInfo;

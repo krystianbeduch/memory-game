@@ -1,0 +1,81 @@
+.notifications {
+    top: 10px;
+    right: 10px;
+    z-index: 99;
+}
+
+.custom-alert {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.progress-bar-timer {
+    position: relative;
+    height: 5px;
+    background-color: var(--progress-bar-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+/* Pasek wypelnienia */
+.progress-bar-fill {
+    height: 100%;
+    width: 100%;
+    transform: translateX(-100%); /* Start od lewej strony */
+    animation: fillProgress linear forwards;
+}
+
+.progress-bar-fill.success {
+    background-color: var(--progress-bar-success);
+}
+
+.progress-bar-fill.danger {
+    background-color: var(--progress-bar-danger);
+}
+
+.progress-bar-fill.warning {
+    background-color: var(--progress-bar-warning);
+}
+
+/* Animacja wypelniania */
+@keyframes fillProgress {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* Animacja wejscia alertu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .progress-bar-timer {
+        height: 4px;
+        margin-top: 5px;
+    }
+
+    .custom-alert {
+        max-width: 90%; /* Rozciągnięcie alertu na 90% szerokości ekranu */
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-bar-timer {
+        height: 3px;
+    }
+
+    .custom-alert {
+        max-width: 100%; /* Alert zajmuje całą szerokość */
+    }
+}

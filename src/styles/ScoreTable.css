@@ -1,0 +1,36 @@
+.best-scores-header-wrapper {
+    position: relative; /* Umozliwia pozycjonowanie select */
+    text-align: center;
+}
+
+.best-scores-header {
+    margin: 0;
+}
+
+.select-board-filter {
+    position: absolute;
+    right: 0; /* Umieszcza select po prawej stronie kontenera */
+    top: 50%; /* Srodek kontenera */
+    transform: translateY(-50%); /* Wyrownuje w pionie */
+    width: 200px;
+}
+
+@media (max-width: 768px) {
+    .select-board-filter {
+        width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .best-scores-header-wrapper {
+        text-align: center;
+    }
+
+    .select-board-filter {
+        position: static;
+        display: block; /* Select zajmuje osobna linie */
+        margin: 1.75em auto 0;
+        width: 25%;
+        max-width: 300px;
+    }
+}
