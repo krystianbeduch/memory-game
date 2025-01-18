@@ -268,49 +268,14 @@ const App: React.FC = () => {
             />
 
             <Header/>
-            {/*<p className="lead">Match all the pairs!</p>*/}
-
-            {/*<BoardSizeSelector*/}
-            {/*    numRows={numRows}*/}
-            {/*    numCols={numCols}*/}
-            {/*    onSizeChange={handleSizeChange}*/}
-            {/*/>*/}
 
             {!isGameStarted && (
                 <>
-                    {/*<p className="text-info mb-3">*/}
-                    {/*    You can change the game board size by selecting one of the options below:*/}
-                    {/*</p>*/}
                     <BoardSizeSelector
                         numRows={numRows}
                         numCols={numCols}
                         onSizeChange={handleSizeChange}
                     />
-                    {/*<div className="button-group-wrapper">*/}
-                        {/*<ButtonGroup className="mb-3">*/}
-                        {/*    <Button*/}
-                        {/*        variant={numRows === 2 && numCols === 2 ? 'primary' : 'secondary'}*/}
-                        {/*        size="lg"*/}
-                        {/*        onClick={() => handleSizeChange(2, 2)}*/}
-                        {/*    >*/}
-                        {/*        2x2*/}
-                        {/*    </Button>*/}
-                        {/*    <Button*/}
-                        {/*        variant={numRows === 4 && numCols === 4 ? 'primary' : 'secondary'}*/}
-                        {/*        size="lg"*/}
-                        {/*        onClick={() => handleSizeChange(4, 4)}*/}
-                        {/*    >*/}
-                        {/*        4x4*/}
-                        {/*    </Button>*/}
-                        {/*    <Button*/}
-                        {/*        variant={numRows === 6 && numCols === 6 ? 'primary' : 'secondary'}*/}
-                        {/*        size="lg"*/}
-                        {/*        onClick={() => handleSizeChange(6, 6)}*/}
-                        {/*    >*/}
-                        {/*        6x6*/}
-                        {/*    </Button>*/}
-                        {/*</ButtonGroup>*/}
-                    {/*</div>*/}
                 </>
             )}
 
@@ -324,43 +289,6 @@ const App: React.FC = () => {
                 onEnd={endGame}
             />
 
-            {/*{!isGameStarted && (*/}
-            {/*    <Button*/}
-            {/*        className="start-button"*/}
-            {/*        onClick={startGame}*/}
-            {/*    >*/}
-            {/*        Start Game*/}
-            {/*    </Button>*/}
-            {/*)}*/}
-
-            {/*<ButtonGroup>*/}
-            {/*    {isGameStarted && !isGamePaused && !isGameEnded && (*/}
-            {/*        <Button*/}
-            {/*            className="pause-button"*/}
-            {/*            onClick={pauseGame}*/}
-            {/*        >*/}
-            {/*            Pause*/}
-            {/*        </Button>*/}
-            {/*    )}*/}
-
-            {/*    {isGameStarted && isGamePaused && (*/}
-            {/*        <Button*/}
-            {/*            className="resume-button"*/}
-            {/*            onClick={resumeGame}*/}
-            {/*        >*/}
-            {/*            Resume*/}
-            {/*        </Button>*/}
-            {/*    )}*/}
-            {/*    {isGameStarted && (*/}
-            {/*        <Button*/}
-            {/*            className="end-button"*/}
-            {/*            onClick={endGame}*/}
-            {/*        >*/}
-            {/*            End Game*/}
-            {/*        </Button>*/}
-            {/*    )}*/}
-            {/*</ButtonGroup>*/}
-
             <GameInfo
                 time={timer}
                 isGameStarted={isGameStarted}
@@ -369,16 +297,6 @@ const App: React.FC = () => {
                 points={points}
                 maxPoints={maxPoints}
             />
-
-            {/*{isGameStarted && !isGameEnded && (*/}
-            {/*    <>*/}
-            {/*        <div className="time-elapsed mb-2 mt-1">*/}
-            {/*            {isGameStarted ? `Time: ${formatTime(timer)}` : ''}*/}
-            {/*        </div>*/}
-            {/*        <p className="mb-0">Moves: {moves}</p>*/}
-            {/*        <p>Points: {points}/{maxPoints}</p>*/}
-            {/*    </>*/}
-            {/*)}*/}
 
             <GameEndScreen
                 isGameEnded={isGameEnded}
@@ -393,35 +311,6 @@ const App: React.FC = () => {
                 formatTime={formatTime}
             />
 
-            {/*{isGameEnded && (*/}
-            {/*    <div className="mt-2">*/}
-            {/*        <h2>Congratulations</h2>*/}
-            {/*        <p>*/}
-            {/*            You finished the game on the {numRows}x{numCols} board*/}
-            {/*            in {formatTime(timer)} in {moves} moves*/}
-            {/*        </p>*/}
-
-            {/*        {!isScoresSaved && (*/}
-            {/*            <>*/}
-            {/*                <input*/}
-            {/*                    type="text"*/}
-            {/*                    placeholder="Enter your name"*/}
-            {/*                    value={playerName}*/}
-            {/*                    onChange={(e) => setPlayerName(e.target.value)}*/}
-            {/*                    className="form-control w-25 mx-auto bg-secondary text-white"*/}
-            {/*                />*/}
-
-            {/*                <Button*/}
-            {/*                    className="d-block mx-auto mt-3 w-25"*/}
-            {/*                    onClick={saveScore}*/}
-            {/*                >*/}
-            {/*                    Save Score*/}
-            {/*                </Button>*/}
-            {/*            </>*/}
-            {/*        )}*/}
-            {/*    </div>*/}
-            {/*)}*/}
-
             <Board
                 board={board}
                 selectedCards={selectedCards}
@@ -435,50 +324,6 @@ const App: React.FC = () => {
                 scoresByBoard={scoresByBoard}
                 onFilterChange={handleBoardFilterChange}
             />
-
-            {/*<h2 className="mt-5 best-scores-header">*/}
-            {/*    Top 10 Best Scores*/}
-            {/*    <select*/}
-            {/*        id="boardFilter"*/}
-            {/*        className="form-select bg-dark-subtle select-board-filter"*/}
-            {/*        value={scoresByBoard}*/}
-            {/*        onChange={handleBoardFilterChange}*/}
-            {/*    >*/}
-            {/*        <option value="">All Board</option>*/}
-            {/*        <option value="2x2">2x2</option>*/}
-            {/*        <option value="4x4">4x4</option>*/}
-            {/*        <option value="6x6">6x6</option>*/}
-            {/*    </select>*/}
-            {/*</h2>*/}
-
-            {/*<table className="table table-dark table-bordered table-striped">*/}
-            {/*    <thead>*/}
-            {/*    <tr>*/}
-            {/*        <th>#</th>*/}
-            {/*        <th>Player Name</th>*/}
-            {/*        <th>Moves</th>*/}
-            {/*        <th>Board</th>*/}
-            {/*        <th>Time</th>*/}
-            {/*    </tr>*/}
-            {/*    </thead>*/}
-            {/*    <tbody>*/}
-            {/*    {top10Scores.length > 0 ? (*/}
-            {/*        top10Scores.map((score, index) => (*/}
-            {/*            <tr key={score.id}>*/}
-            {/*                <td>{index + 1}</td>*/}
-            {/*                <td>{score.playerName}</td>*/}
-            {/*                <td>{score.moves}</td>*/}
-            {/*                <td>{score.board}</td>*/}
-            {/*                <td>{score.timeTaken}</td>*/}
-            {/*            </tr>*/}
-            {/*        ))*/}
-            {/*    ) : (*/}
-            {/*        <tr>*/}
-            {/*            <td colSpan={5}>No scores available for the selected board</td>*/}
-            {/*        </tr>*/}
-            {/*    )}*/}
-            {/*    </tbody>*/}
-            {/*</table>*/}
 
             <Footer/>
 

@@ -1,7 +1,8 @@
-package com.memoryBackend.memoryBackend.controller;
+package com.memory.backend.controller;
 
-import com.memoryBackend.memoryBackend.model.Score;
-import com.memoryBackend.memoryBackend.service.ScoreService;
+import com.memory.backend.model.Score;
+import com.memory.backend.service.ScoreService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/scores")
 public class ScoreController {
     private final ScoreService scoreService;
 
@@ -19,17 +21,15 @@ public class ScoreController {
         this.scoreService = scoreService;
     }
 
-    @GetMapping("/api/scores")
-    public ResponseEntity<List<Score>> showScores() {
-        List<Score> scores = scoreService.getAllScoresOrderByBoardDescAndMovesAsc();
-        if(scores == null) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(scores, HttpStatus.OK);
+    @GetMapping
+    public List<Score> showScores() {
+        // List.copyOf tworzy niemodyfikowalna kolekcje
+        return List.copyOf(scoreService.getAllScoresOrderByBoardDescAndMovesAsc());
     }
 
-    @PostMapping("/api/scores")
-    public ResponseEntity<Score> addScore(@RequestBody Score score) {
+    @PostMapping
+    public ResponseEntity<Score> addScore(@RequestBody @Valid Score score) {
+        // Jesli walidacja nie powiedzie sie, Spring automatycznie wyrzuci wyjątek 400
         Score savedScore = scoreService.saveScore(score);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedScore);
     }

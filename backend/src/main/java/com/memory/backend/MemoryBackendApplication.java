@@ -1,4 +1,4 @@
-package com.memoryBackend.memoryBackend;
+package com.memory.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

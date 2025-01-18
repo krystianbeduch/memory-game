@@ -1,8 +1,7 @@
-package com.memoryBackend.memoryBackend.repository;
+package com.memory.backend.repository;
 
-import com.memoryBackend.memoryBackend.model.Score;
+import com.memory.backend.model.Score;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ScoreRepository extends MongoRepository<Score, String> {
-
 }

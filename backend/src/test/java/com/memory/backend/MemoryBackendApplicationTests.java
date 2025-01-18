@@ -1,4 +1,4 @@
-package com.memoryBackend.memoryBackend;
+package com.memory.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

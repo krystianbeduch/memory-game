@@ -1,7 +1,7 @@
-package com.memoryBackend.memoryBackend.service;
+package com.memory.backend.service;
 
-import com.memoryBackend.memoryBackend.model.Score;
-import com.memoryBackend.memoryBackend.repository.ScoreRepository;
+import com.memory.backend.model.Score;
+import com.memory.backend.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import java.util.List;
 
 @Service
 public class ScoreService {
+
     private final ScoreRepository scoreRepository;
 
     @Autowired
