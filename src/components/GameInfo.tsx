@@ -23,7 +23,6 @@ const GameInfo: React.FC<TimerProps> = ({
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
-    // return <p>Time Elapsed: {formatTime(time)}</p>;
     return (
         isGameStarted && !isGameEnded && (
             <>

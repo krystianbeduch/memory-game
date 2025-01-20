@@ -1,19 +1,11 @@
 import React from 'react';
-// @ts-ignore
 import { Table } from 'react-bootstrap';
+import { ScoreProps } from '../types/types';
 import '../styles/ScoreTable.css';
 
-interface Score {
-    id: string;
-    playerName: string;
-    moves: number;
-    board: string;
-    timeTaken: number;
-    createdAt: string;
-}
 
 interface ScoreTableProps {
-    scores: Score[];
+    scores: ScoreProps[];
     scoresByBoard: string;
     onFilterChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
@@ -39,36 +31,43 @@ const ScoreTable: React.FC<ScoreTableProps> = ({
                     <option value="2x2">2x2</option>
                     <option value="4x4">4x4</option>
                     <option value="6x6">6x6</option>
-                    {/*<option value="8x8">8x8</option>*/}
+                    <option value="8x8">8x8</option>
                 </select>
             </div>
 
             <Table variant="dark" striped bordered hover>
-                    <thead>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player Name</th>
+                    <th>Moves</th>
+                    <th>Board</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {scores.length > 0 ? (
+                    scores.map((score, index) => (
+                            <tr key={score.id}>
+                                <td>{index + 1}</td>
+                                <td>{score.playerName}</td>
+                                <td>{score.moves}</td>
+                                <td>{score.board}</td>
+                                <td>{score.timeTaken}s</td>
+                                <td>{new Date(score.createdAt).toLocaleString()}</td>
+                            </tr>
+                        ))
+                ) : (
                     <tr>
-                        <th>#</th>
-                        <th>Player Name</th>
-                        <th>Moves</th>
-                        <th>Board</th>
-                        <th>Time</th>
-                        <th>Date</th>
+                        <td colSpan={6}>No scores available for the selected board</td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {scores.map((score, index) => (
-                        <tr key={score.id}>
-                            <td>{index + 1}</td>
-                            <td>{score.playerName}</td>
-                            <td>{score.moves}</td>
-                            <td>{score.board}</td>
-                            <td>{score.timeTaken}s</td>
-                            <td>{new Date(score.createdAt).toLocaleString()}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </Table>
-            </>
-            );
-            };
+                )}
 
-            export default ScoreTable;
+                </tbody>
+            </Table>
+        </>
+    );
+};
+
+export default ScoreTable;

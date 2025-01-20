@@ -22,6 +22,11 @@
 }
 
 @media (max-width: 480px) {
+    table th, table td {
+        font-size: 0.6em;
+        padding: 4px;
+
+    }
     .best-scores-header-wrapper {
         text-align: center;
     }

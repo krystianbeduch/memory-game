@@ -1,36 +1,24 @@
 import React, { useState, useEffect } from 'react';
-// @ts-ignore
-import axios, {AxiosError, AxiosResponse} from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+
+import AlertWithTimer from './components/AlertWithTimer';
+import Board from './components/Board';
+import BoardSizeSelector from './components/BoardSizeSelector';
+import Footer from './components/Footer';
+import GameControls from './components/GameControls';
+import GameEndScreen from './components/GameEndScreen';
+import GameInfo from './components/GameInfo';
+import Header from './components/Header';
+import ScoreTable from './components/ScoreTable';
+
 import generateBoard from './utils/generateBoard';
-import Board from "./components/Board";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import AlertWithTimer from "./components/AlertWithTimer";
+import { formatTime } from './utils/formatTime';
+import { useGameTimer } from './utils/useGameTimer';
 
-// @ts-ignore
-import {Button, ButtonGroup, Table} from 'react-bootstrap';
+import { CardProps, ScoreProps } from './types/types';
 import './styles/App.css';
-import BoardSizeSelector from "./components/BoardSizeSelector";
-import GameControls from "./components/GameControls";
-import GameInfo from "./components/GameInfo";
-import ScoreTable from "./components/ScoreTable";
-import GameEndScreen from "./components/GameEndScreen";
 
-interface Card {
-    id: number;
-    image: string;
-    isFlipped: boolean;
-    isMatched: boolean;
-}
 
-interface Score {
-    id: string;
-    playerName: string;
-    moves: number;
-    board: string;
-    timeTaken: number;
-    createdAt: string;
-}
 
 const App: React.FC = () => {
     /*
@@ -64,12 +52,11 @@ const App: React.FC = () => {
     alertType - typ komunikatu
     alertVisible - widocznosc alerta
     */
-
     const [numRows, setNumRows] = useState<number>(4);
     const [numCols, setNumCols] = useState<number>(4);
 
-    const [board, setBoard] = useState<Card[]>(generateBoard(numRows, numCols));
-    const [selectedCards, setSelectedCards] = useState<Card[]>([]);
+    const [board, setBoard] = useState<CardProps[]>(generateBoard(numRows, numCols));
+    const [selectedCards, setSelectedCards] = useState<CardProps[]>([]);
     const [moves, setMoves] = useState<number>(0);
 
     const [points, setPoints] = useState<number>(0);
@@ -80,7 +67,7 @@ const App: React.FC = () => {
     const [isGamePaused, setIsGamePaused] = useState<boolean>(false);
     const [isGameEnded, setIsGameEnded] = useState<boolean>(false);
 
-    const [scores, setScores] = useState<Score[]>([]);
+    const [scores, setScores] = useState<ScoreProps[]>([]);
     const [scoresByBoard, setScoresByBoard] = useState<string>(''); // '' - brak filtra
     const [playerName, setPlayerName] = useState<string>('');
     const [isScoresSaved, setIsScoresSaved] = useState<boolean>(false);
@@ -99,8 +86,8 @@ const App: React.FC = () => {
     // Pobierz dane z API
     useEffect(() => {
         axios
-            .get<Score[]>('http://localhost:8080/api/scores')
-            .then((response: AxiosResponse<Score[]>) => {
+            .get<ScoreProps[]>('http://localhost:8080/api/scores')
+            .then((response: AxiosResponse<ScoreProps[]>) => {
                 setScores(response.data);
             })
             .catch((error: AxiosError) => {
@@ -110,7 +97,7 @@ const App: React.FC = () => {
 
     // Zapisz wynik gry
     const saveScore = async () => {
-        if (playerName.trim() && points !== null && timer !== null) {
+        if (playerName.trim().length >= 3 && moves !== null && timer !== null) {
             try {
                 const boardType = `${numCols}x${numRows}`;
                 const response = await axios.post('http://localhost:8080/api/scores', {
@@ -120,7 +107,7 @@ const App: React.FC = () => {
                     timeTaken: timer,
                 });
                 console.log('Score saved:', response.data);
-                setAlertMessage('Your score has been saved successfully!');
+                setAlertMessage('Your score has been saved successfully! Refresh page to see it.');
                 setAlertType('success');
                 setIsScoresSaved(true);
             }
@@ -131,7 +118,7 @@ const App: React.FC = () => {
             }
         }
         else {
-            setAlertMessage('Please ensure your name is entered!');
+            setAlertMessage('Please ensure your name is entered and has at least 3 characters!');
             setAlertType('warning');
         }
     };
@@ -149,21 +136,7 @@ const App: React.FC = () => {
         }
     }, [alertMessage]);
 
-    // GameInfo gry
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        if (isGameStarted && !isGamePaused && !isGameEnded) {
-            interval = setInterval(() => {
-                setTimer(prevTime => prevTime + 1);
-            }, 1000);
-        }
-        else {
-            // @ts-ignore
-            clearInterval(interval);
-        }
-        return () => clearInterval(interval)
-    }, [isGameStarted, isGamePaused, isGameEnded]); // Tylko gdy zmieni sie stan gry
+    useGameTimer(isGameStarted, isGamePaused, isGameEnded, setTimer);
 
     // Sprawdzenie czy koniec gry
     useEffect(() => {
@@ -195,11 +168,6 @@ const App: React.FC = () => {
         setBoard(generateBoard(numRows, numCols));
     };
 
-    const formatTime = (time: number)=> {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
 
     const handleSizeChange = (rows: number, cols: number) => {
         setNumRows(rows);
@@ -208,7 +176,7 @@ const App: React.FC = () => {
         setPoints(0);
     };
 
-    const handleCardClick = (card: Card) => {
+    const handleCardClick = (card: CardProps) => {
         // Ignorujemy klikniecie, jesli karta juz jest sparowana a takze jest gra nie jest rozpoczeta lub zapauzowana
         if (card.isMatched || selectedCards.includes(card) || selectedCards.length === 2 || !isGameStarted || isGamePaused) {
             return;
@@ -252,11 +220,11 @@ const App: React.FC = () => {
         setScoresByBoard(event.target.value);
     };
 
-    const filteredScores = scores.filter((score) =>
-        scoresByBoard === '' || score.board === scoresByBoard
-    );
+    const top10Scores = scores
+        .filter((score) => !scoresByBoard || score.board === scoresByBoard)
+        .slice(0, 10
 
-    const top10Scores = filteredScores.slice(0, 10);
+    );
 
     return (
         <div className="container text-center App">
@@ -283,7 +251,7 @@ const App: React.FC = () => {
                 isGameStarted={isGameStarted}
                 isGamePaused={isGamePaused}
                 isGameEnded={isGameEnded}
-                onStart={() => startGame()}
+                onStart={startGame}
                 onPause={pauseGame}
                 onResume={resumeGame}
                 onEnd={endGame}

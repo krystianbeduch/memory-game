@@ -1,5 +1,4 @@
 import React from 'react';
-// @ts-ignore
 import { ButtonGroup, Button } from 'react-bootstrap';
 import '../styles/BoardSizeSelector.css';
 
@@ -18,7 +17,7 @@ const BoardSizeSelector: React.FC<BoardSizeSelectorProps> = ({
         { rows: 2, cols: 2 },
         { rows: 4, cols: 4 },
         { rows: 6, cols: 6 },
-        // { rows: 8, cols: 8 },
+        { rows: 8, cols: 8 }
     ];
 
     return (
@@ -41,8 +40,6 @@ const BoardSizeSelector: React.FC<BoardSizeSelectorProps> = ({
                 </ButtonGroup>
             </div>
         </>
-
-
     );
 };
 

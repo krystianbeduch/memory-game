@@ -1,13 +1,5 @@
 /* Style globalne dla aplikacji */
-.App {
-  /*text-align: center;*/
-  /*background-color: #2e2e2e; !* Ciemniejsze tło aplikacji *!*/
-  /*background-color: var(--board-background);*/
-  /*color: white;*/
-  /*min-height: 100vh;*/
-  /*padding: 20px;*/
-}
-
+.App {}
 
 @media (max-width: 768px) {
     h2 {

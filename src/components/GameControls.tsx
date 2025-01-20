@@ -1,5 +1,4 @@
 import React from 'react';
-// @ts-ignore
 import { Button, ButtonGroup } from 'react-bootstrap';
 import '../styles/GameControls.css'
 
@@ -21,8 +20,7 @@ const GameControls: React.FC<GameControlsProps> = ({
     onPause,
     onResume,
     onEnd,
-   }) => {
-    console.log(`${isGameEnded} ${isGamePaused}`)
+}) => {
     return (
         <div className="mb-3 d-flex align-items-center justify-content-center">
             {isGameStarted ? (

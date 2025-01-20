@@ -3,7 +3,6 @@
     padding: 0.4em 1.1em;
 }
 
-/* Dostosowanie do mniejszych ekranów */
 @media (max-width: 768px) {
     .button-group-wrapper .btn {
         font-size: 1em;

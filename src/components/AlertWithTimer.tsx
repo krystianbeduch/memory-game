@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from 'react';
 import '../styles/AlertWithTimer.css';
 
 interface AlertProps {
@@ -9,8 +9,7 @@ interface AlertProps {
     onClose: () => void;
 }
 
-const AlertWithTimer: React.FC<AlertProps> = ({ message, type, show, duration = 5000, onClose }) => {
-
+const AlertWithTimer: React.FC<AlertProps> = ({message, type, show, duration = 5000, onClose}) => {
     useEffect(() => {
         if (show) {
             const timer = setTimeout(onClose, duration);
@@ -32,11 +31,11 @@ const AlertWithTimer: React.FC<AlertProps> = ({ message, type, show, duration = 
                 <div className="progress-bar-timer">
                     <div
                         className={`progress-bar-fill ${type}`}
-                        style={{ animationDuration: `${duration}ms` }}
+                        style={{animationDuration: `${duration}ms`}}
                     ></div>
                 </div>
             </div>
-    </div>
+        </div>
     )
 };
 

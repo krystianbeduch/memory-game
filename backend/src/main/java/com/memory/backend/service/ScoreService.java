@@ -22,7 +22,8 @@ public class ScoreService {
     public List<Score> getAllScoresOrderByBoardDescAndMovesAsc() {
         return scoreRepository.findAll(Sort.by(
                 Sort.Order.desc("board"),
-                Sort.Order.asc("moves")
+                Sort.Order.asc("moves"),
+                Sort.Order.asc("timeTaken")
         ));
     }
 

@@ -1,30 +1,49 @@
-interface Card {
-    id: number;
-    image: string;
-    isMatched: boolean;
-    isFlipped: boolean;
-}
+// interface Card {
+//     id: number;
+//     image: string;
+//     isMatched: boolean;
+//     isFlipped: boolean;
+// }
+import { CardProps } from '../types/types';
+import Card from "../components/Card";
 
-const generateBoard = (rows: number, cols: number): Card[] => {
+const generateBoard = (rows: number, cols: number): CardProps[] => {
     const images = [
-        '/images/assembler_logo.png',
-        '/images/c_logo.png',
-        '/images/cpp_logo.png',
-        '/images/csharp_logo.png',
-        '/images/css_logo.png',
-        '/images/html_logo.png',
-        '/images/java_logo.png',
-        '/images/javascript_logo.png',
-        '/images/kotlin_logo.png',
-        '/images/php_logo.png',
-        '/images/ruby_logo.png',
-        '/images/sql_logo.png',
-        '/images/swift_logo.png',
-        '/images/typescript_logo.png',
-        '/images/spring_logo.png',
-        '/images/react_logo.png',
-        '/images/angular_logo.png',
-        '/images/vue_logo.png',
+        '/images/memory-cards/assembler_logo.png',
+        '/images/memory-cards/c_logo.png',
+        '/images/memory-cards/cpp_logo.png',
+        '/images/memory-cards/csharp_logo.png',
+        '/images/memory-cards/css_logo.png',
+        '/images/memory-cards/html_logo.png',
+        '/images/memory-cards/java_logo.png',
+        '/images/memory-cards/javascript_logo.png',
+        '/images/memory-cards/kotlin_logo.png',
+        '/images/memory-cards/php_logo.png',
+
+        '/images/memory-cards/ruby_logo.png',
+        '/images/memory-cards/sql_logo.png',
+        '/images/memory-cards/swift_logo.png',
+        '/images/memory-cards/typescript_logo.png',
+        '/images/memory-cards/spring_logo.png',
+        '/images/memory-cards/react_logo.png',
+        '/images/memory-cards/angular_logo.png',
+        '/images/memory-cards/vue_logo.png',
+        '/images/memory-cards/golang_logo.png',
+        '/images/memory-cards/fsharp_logo.png',
+
+        '/images/memory-cards/r_logo.png',
+        '/images/memory-cards/perl_logo.png',
+        '/images/memory-cards/dart_logo.png',
+        '/images/memory-cards/lua_logo.png',
+        '/images/memory-cards/django_logo.png',
+        '/images/memory-cards/nodejs_logo.png',
+        '/images/memory-cards/ruby_on_rails_logo.png',
+        '/images/memory-cards/laravel_logo.png',
+        '/images/memory-cards/symfony_logo.png',
+        '/images/memory-cards/asp_dot_net_core_logo.png',
+
+        '/images/memory-cards/hibernate_logo.png',
+        '/images/memory-cards/thymeleaf_logo.png'
     ];
 
     const totalCards = rows * cols;
@@ -36,7 +55,7 @@ const generateBoard = (rows: number, cols: number): Card[] => {
         .slice(0, numPairs); // Wybierz odpowiednia liczbe unikalnych obrazkow
 
     // Tworzenie kart z obrazkami w parach
-    const cards: Card[] = [];
+    const cards: CardProps[] = [];
     selectedImages.forEach((image, index) => {
         // Dodajemy dwie karty z tym samym obrazkiem (para)
         cards.push({ id: index * 2, image, isFlipped: false, isMatched: false });
@@ -47,7 +66,7 @@ const generateBoard = (rows: number, cols: number): Card[] => {
 };
 
 // Funkcja do tasowania kart (shuffle)
-const shuffle = (array: Card[]): Card[] => {
+const shuffle = (array: CardProps[]): CardProps[] => {
     let shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));

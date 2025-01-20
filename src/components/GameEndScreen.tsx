@@ -1,5 +1,4 @@
-import React from 'react';;
-// @ts-ignore
+import React from 'react';
 import { Button } from 'react-bootstrap';
 
 interface GameEndScreenProps {

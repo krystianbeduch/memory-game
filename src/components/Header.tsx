@@ -1,6 +1,5 @@
-import React from "react";
-// @ts-ignore
-import logo from "../assets/favicon/logo.png";
+import React from 'react';
+import logo from '../images/logo.png';
 import '../styles/Header.css';
 
 const Header: React.FC = () => {
